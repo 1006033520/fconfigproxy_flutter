@@ -1,0 +1,8 @@
+
+builders:
+  FConfigGenerator:
+    import: 'package:fconfigproxy/generator/FConfigGenerator.dart'
+    builder_factories: ['fConfigBuilder']
+    build_extensions: {".dart": [".f.dart"]}
+    auto_apply: root_package
+    build_to: source
