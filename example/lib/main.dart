@@ -1,4 +1,5 @@
 import 'package:fconfigproxy_example/UserConfig.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -6,11 +7,17 @@ import 'package:flutter/services.dart';
 import 'package:fconfigproxy/fconfigproxy.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() async {
 
-  final directory = await getApplicationSupportDirectory();
-  Hive.init(directory.path);
+  if (kIsWeb) {
+    Hive.init('/');
+  } else {
+    final directory = await getApplicationSupportDirectory();
+    Hive.init(directory.path);
+  }
+
   await Hive.openBox("UserConfig");
 
   runApp(const MyApp());
@@ -24,7 +31,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   bool _isLogin = UserConfig.getUserConfig().isLogin;
   @override
   void initState() {
@@ -37,18 +43,17 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
+        appBar: AppBar(title: const Text('Plugin example app')),
         body: Center(
           child: ListView(
             children: [
-              Text('UserName: ${UserConfig.getUserConfig().userName ?? "null"}'),
+              Text(
+                'UserName: ${UserConfig.getUserConfig().userName ?? "null"}',
+              ),
               Text('Age: ${UserConfig.getUserConfig().age ?? "null"}'),
               Text('Is Login: $_isLogin'),
               ElevatedButton(
