@@ -1,5 +1,4 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:fconfigproxy/annotation/FConfigAnnotationGenerator.dart';
 import 'package:fconfigproxy/generator/HelpGenerator.dart';
 import 'package:fconfigproxy/utils/fun.dart';

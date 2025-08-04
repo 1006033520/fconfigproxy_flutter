@@ -1,7 +1,3 @@
-import 'package:meta/meta.dart';
-
-import '../agreement/FConfigKeyValueHandle.dart';
-
 /// 配置注解类，用于标记配置名称和代理类型。
 class FConfig {
   /// 配置名称
