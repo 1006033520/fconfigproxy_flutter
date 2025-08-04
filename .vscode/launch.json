@@ -1,0 +1,31 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Flutter: Debug example app",
+            "request": "launch",
+            "type": "dart",
+            "program": "example/lib/main.dart"
+        },
+        {
+            "name": "Flutter: Debug plugin tests",
+            "request": "launch",
+            "type": "dart",
+            "program": "test/fconfigproxy_test.dart"
+        },
+        {
+            "name": "Debug build_runner",
+            "type": "dart",
+            "request": "launch",
+            "program": "${workspaceFolder}\\.dart_tool\\build\\entrypoint\\build.dart",
+            "args": [
+                "build"
+            ], // 可以替换为 "build" 或其他命令
+            "cwd": "${workspaceFolder}",
+            "console": "terminal",
+        }
+    ]
+}

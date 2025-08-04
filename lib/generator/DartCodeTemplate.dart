@@ -55,6 +55,10 @@ class _{{className}}Impl implements {{className}} {
       {{{valueUpdateListener}}}
     }
     {{/valueUpdates}}
+
+    {{#otherMethodListeners}}
+    {{{code}}}
+    {{/otherMethodListeners}}
   }
   
   {{#interceptMethods}}
@@ -71,7 +75,7 @@ class _{{className}}Impl implements {{className}} {
   @override
   set {{name}}({{{type}}}{{#typeIsNull}}?{{/typeIsNull}} value) {
     {{#isIntercept}}
-    _{{keyName}} = _{{interceptName}}(value);
+    _{{keyName}} = _{{interceptName}}_intercept(value);
     {{/isIntercept}}
     {{^isIntercept}}
     _{{keyName}} = value;
@@ -83,7 +87,7 @@ class _{{className}}Impl implements {{className}} {
   @override
   {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} get {{name}} {
     {{#isIntercept}}
-    return _{{interceptName}}(_{{keyName}});
+    return _{{interceptName}}_intercept(_{{keyName}});
     {{/isIntercept}}
     {{^isIntercept}}
     return _{{keyName}};
@@ -93,16 +97,12 @@ class _{{className}}Impl implements {{className}} {
   
   {{#otherMethods}}
   @override
-  {{{type}}} {{name}}(
+  {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} {{name}}(
     {{#methodParams}}
-    {{{type}}} {{name}},
+    {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} {{name}},
     {{/methodParams}}
   ) {
-    return _{{interceptName}}(
-      {{#methodParams}}
-      {{name}},
-      {{/methodParams}}
-    );
+    {{methodBody}}
   }
   {{/otherMethods}}
   

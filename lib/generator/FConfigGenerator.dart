@@ -1,15 +1,13 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:fconfigproxy/annotation/FConfigKey.dart';
+import 'package:fconfigproxy/annotation/FConfigAnnotationGenerator.dart';
 import 'package:fconfigproxy/generator/HelpGenerator.dart';
+import 'package:fconfigproxy/utils/fun.dart';
 import 'package:mustache_template/mustache.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:build/build.dart';
 import '../annotation/FConfig.dart';
-import '../annotation/FConfigAnnotationGenerator.dart';
 import 'DartCodeTemplate.dart';
-import 'package:build/build.dart';
 
 Builder fConfigBuilder(BuilderOptions options) =>
     LibraryBuilder(FConfigGenerator());
@@ -51,166 +49,86 @@ class FConfigGenerator extends Generator {
         final List<Map<String, dynamic>> interceptMethods = [];
         final List<Map<String, dynamic>> interceptClassCodes = [];
         final List<Map<String, dynamic>> valueUpdates = [];
+        final List<Map<String, dynamic>> otherMethodListeners = [];
+        final List<Map<String, dynamic>> otherMethods = [];
+
+        final List<FieldInfo> fieldInfos = [];
+        final List<FieldInterceptInfo> fieldInterceptInfos = [];
+        final List<FieldElement> fieldElementIntercepts = [];
+        final List<ConstantReader> fieldReaderIntercepts = [];
 
         for (var field in element.fields) {
-          final fieldInfo = FieldInfo.create(field);
-
-          var interceptAnnotation = findFirstAnnotation(
-            field,
-            FConfigFieldInterceptGenerator,
-          );
-
-          if (!fieldInfo.typeIsNull && fieldInfo.defaultValue == 'null') {
+          final fieldIntercept = findFirstAnnotation(field, FConfigFieldInterceptGenerator);
+          if(fieldIntercept != null){
+            fieldElementIntercepts.add(field);
+            fieldReaderIntercepts.add(fieldIntercept);
             continue;
           }
-          fields.add(fieldInfo.toMap());
-          getMethods.add(fieldInfo.toMap());
-          if (fieldInfo.isSet) {
-            setMethods.add(fieldInfo.toMap());
+          final fieldInfo = FieldInfo.create(field);
+          if(fieldInfo.typeIsNull || fieldInfo.defaultValue != 'null') {
+            fieldInfos.add(fieldInfo);
           }
-          // {
-          //   final keyName = fConfigKey?.read('keyName').stringValueOrNull;
-          //   if (keyName != null) {
-          //     final getFieldCode = interceptAnnotation
-          //         .read('getFieldCode')
-          //         .stringValueOrNull;
-          //     final classCode = interceptAnnotation
-          //         .read('classCode')
-          //         .stringValueOrNull;
-          //     final valueUpdateListenerFunCode = interceptAnnotation
-          //         .read('valueUpdateListenerFunCode')
-          //         .stringValueOrNull;
-          //
-          //     final genericType = element.fields.firstWhere((field) {
-          //       final fConfigKey = getAnnotation<FConfigKey>(field);
-          //       final _keyName =
-          //           fConfigKey?.read('keyName').stringValueOrNull ?? field.name;
-          //       return _keyName == keyName;
-          //     }).type;
-          //
-          //     if (classCode != null) {
-          //       interceptClassCodes.add({
-          //         'code': Template(classCode).renderString({
-          //           'name': field.name,
-          //           'keyName': keyName,
-          //           'type': genericType.getDisplayString(
-          //             withNullability: false,
-          //           ),
-          //           'typeIsNull':
-          //               genericType.nullabilitySuffix ==
-          //               NullabilitySuffix.question,
-          //         }),
-          //       });
-          //     }
-          //
-          //     if (valueUpdateListenerFunCode != null) {
-          //       valueUpdates.add({
-          //         'keyName': keyName,
-          //         'valueUpdateListener': Template(valueUpdateListenerFunCode)
-          //             .renderString({
-          //               'name': field.name,
-          //               'type': genericType.getDisplayString(
-          //                 withNullability: false,
-          //               ),
-          //               'typeIsNull':
-          //                   genericType.nullabilitySuffix ==
-          //                   NullabilitySuffix.question,
-          //             }),
-          //       });
-          //     }
-          //
-          //     if (getFieldCode != null) {
-          //       interceptMethods.add({
-          //         'type': field.type,
-          //         'typeIsNull':
-          //             field.type.nullabilitySuffix ==
-          //             NullabilitySuffix.question,
-          //         'name': '_get_${field.name}',
-          //         'methodParams': [
-          //           {
-          //             'type': genericType.getDisplayString(
-          //               withNullability: false,
-          //             ),
-          //             'typeIsNull':
-          //                 genericType.nullabilitySuffix ==
-          //                 NullabilitySuffix.question,
-          //             'name': 'value',
-          //           },
-          //         ],
-          //         'methodBody': Template(getFieldCode).renderString({
-          //           'keyName': keyName,
-          //           'type': field.type.getDisplayString(withNullability: false),
-          //           'typeIsNull':
-          //               field.type.nullabilitySuffix ==
-          //               NullabilitySuffix.question,
-          //           'name': field.name,
-          //         }),
-          //       });
-          //
-          //       getMethods.add({
-          //         'type': field.type,
-          //         'typeIsNull':
-          //             field.type.nullabilitySuffix ==
-          //             NullabilitySuffix.question,
-          //         'name': field.name,
-          //         'isIntercept': true,
-          //         'interceptName': '_get_${field.name}_intercept',
-          //         'keyName':
-          //             fConfigKey?.read('keyName').stringValueOrNull ??
-          //             field.name,
-          //       });
-          //     }
-          //
-          //     if (!field.isFinal) {
-          //       final setFieldCode = interceptAnnotation
-          //           .read('setFieldCode')
-          //           .stringValueOrNull;
-          //       if (setFieldCode != null) {
-          //         interceptMethods.add({
-          //           'type': field.type.getDisplayString(withNullability: false),
-          //           'typeIsNull':
-          //               field.type.nullabilitySuffix ==
-          //               NullabilitySuffix.question,
-          //           'name': field.name,
-          //           'methodParams': [
-          //             {
-          //               'type': field.type.getDisplayString(
-          //                 withNullability: false,
-          //               ),
-          //               'typeIsNull':
-          //                   field.type.nullabilitySuffix ==
-          //                   NullabilitySuffix.question,
-          //             },
-          //           ],
-          //           'methodBody': Template(setFieldCode).renderString({
-          //             'keyName': keyName,
-          //             'type': field.type.getDisplayString(
-          //               withNullability: false,
-          //             ),
-          //             'typeIsNull':
-          //                 field.type.nullabilitySuffix ==
-          //                 NullabilitySuffix.question,
-          //             'name': field.name,
-          //           }),
-          //         });
-          //
-          //         setMethods.add({
-          //           'type': field.type.getDisplayString(withNullability: false),
-          //           'typeIsNull':
-          //               field.type.nullabilitySuffix ==
-          //               NullabilitySuffix.question,
-          //           'name': field.name,
-          //           'isIntercept': true,
-          //           'interceptName': '_${field.name}_intercept',
-          //           'keyName':
-          //               fConfigKey?.read('keyName').stringValueOrNull ??
-          //               field.name,
-          //         });
-          //       }
-          //     }
-          //   }
-          // }
         }
+
+        element.methods.forEach((it){
+          final funIntercept = findFirstAnnotation(it, FConfigFunInterceptGenerator);
+          if(funIntercept != null){
+            final otherMethodInfo = OtherMethodInfo.create(it, funIntercept);
+            otherMethods.add({
+              'name': otherMethodInfo.name,
+              'type': otherMethodInfo.type,
+              'typeIsNull': otherMethodInfo.typeIsNull,
+              'methodParams': otherMethodInfo.methodParams,
+              'methodBody': otherMethodInfo.methodBody,
+            });
+
+            if(otherMethodInfo.classCode != null) {
+              interceptClassCodes.add({'code': otherMethodInfo.classCode!});
+            }
+
+            if(otherMethodInfo.valueUpdateListenerFunCode != null) {
+              otherMethodListeners.add({
+                'code': otherMethodInfo.valueUpdateListenerFunCode,
+              });
+            }
+
+          }
+
+        });
+
+        for (var i = 0; i < fieldElementIntercepts.length; i++) {
+          final fieldElement = fieldElementIntercepts[i];
+          final fieldReader = fieldReaderIntercepts[i];
+          final fieldInfo = FConfigKeyAnalysis.analysis(fieldElement)?.let((it){
+            return fieldInfos.firstWhere((element) => element.keyName == it.keyName);
+          });
+          if(fieldInfo == null){
+            continue;
+          }
+          final fieldInterceptInfo = FieldInterceptInfo.create(fieldInfo,fieldElement, fieldReader);
+          fieldInterceptInfos.add(fieldInterceptInfo);
+        }
+
+        fields.addAll(fieldInfos.map((fieldInfo)=>fieldInfo.toMap));
+        getMethods.addAll(fieldInfos.map((fieldInfo)=>fieldInfo.toMap));
+        setMethods.addAll(fieldInfos.where((fieldInfo)=>fieldInfo.isSet).map((fieldInfo)=>fieldInfo.toMap));
+
+        fieldInterceptInfos.forEach(((it) {
+          if(it.classCode != null) {
+            interceptClassCodes.add({'code': it.classCode!});
+          }
+
+          interceptMethods.addAll(it.toInterceptMethodMaps());
+
+          if(it.getFieldCode != null) {
+            getMethods.add(it.toGetCodeMaps());
+          }
+
+          if(it.setFieldCode != null) {
+            setMethods.add(it.toSetCodeMaps());
+          }
+
+        }));
 
         final generatorCode = Template(dartCodeTemplate).renderString({
           'className': element.name,
@@ -222,9 +140,9 @@ class FConfigGenerator extends Generator {
           'interceptMethods': interceptMethods,
           'setMethods': setMethods,
           'getMethods': getMethods,
-          'otherMethods': [],
+          'otherMethodListeners': otherMethodListeners,
+          'otherMethods': otherMethods,
         });
-
         buffer.writeln(generatorCode);
       }
     }
@@ -236,13 +154,10 @@ class FConfigGenerator extends Generator {
     final interceptChecker = TypeChecker.fromRuntime(type);
     for (final annotation in element.metadata) {
       final constantValue = annotation.computeConstantValue();
-      print('findFirstAnnotation 1 $element $constantValue');
       if (constantValue == null) continue;
       final annotationType = constantValue.type;
-      print('findFirstAnnotation 2 $element $annotationType');
       if (annotationType != null &&
           interceptChecker.isAssignableFromType(annotationType)) {
-        print('findFirstAnnotation 3 $element $constantValue');
         return ConstantReader(constantValue);
       }
     }
@@ -256,12 +171,3 @@ ConstantReader? getAnnotation<T>(Element element) {
   return annotations.isNotEmpty ? ConstantReader(annotations.first) : null;
 }
 
-extension ConstantReaderExtension on ConstantReader {
-  get stringValueOrNull {
-    return isNull ? null : stringValue;
-  }
-
-  get typeValueOrNull {
-    return isNull ? null : typeValue;
-  }
-}

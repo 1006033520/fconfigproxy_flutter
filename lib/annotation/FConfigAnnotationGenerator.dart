@@ -5,7 +5,7 @@ abstract class FConfigFunInterceptGenerator {
 
   abstract final String? valueUpdateListenerFunCode;
 
-  abstract final String? funCode;
+  abstract final String funCode;
 }
 
 abstract class FConfigFieldInterceptGenerator {
