@@ -1,14 +1,14 @@
-import 'package:meta/meta_meta.dart';
+import 'package:meta/meta.dart';
 
 import '../agreement/FConfigKeyValueHandle.dart';
 
-/**
- * FConfig.dart
- * 配置注解类
- */
-@Target({TargetKind.classType})
-class FConfig{
+/// 配置注解类，用于标记配置名称和代理类型。
+class FConfig {
+  /// 配置名称
   final String configName;
-  final Type fConfigProxyType;
-  const FConfig(this.configName,this.fConfigProxyType);
+  /// 代理类型
+  final Type proxyType;
+
+  /// 创建一个 [FConfig] 实例，需指定 [configName] 和 [proxyType]。
+  const FConfig(this.configName, this.proxyType);
 }
