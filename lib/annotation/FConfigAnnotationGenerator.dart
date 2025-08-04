@@ -6,6 +6,8 @@ abstract class FConfigFunInterceptGenerator {
   abstract final String? valueUpdateListenerFunCode;
 
   abstract final String funCode;
+
+  abstract final bool isAsync;
 }
 
 abstract class FConfigFieldInterceptGenerator {

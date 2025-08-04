@@ -12,12 +12,15 @@ class FConfigClearAll implements FConfigFunInterceptGenerator {
 
   @override
   final String funCode = '''
-  _ConfigProxy.deleteAllValues();
+  await _ConfigProxy.deleteAllValues();
   _read();
   ''';
 
   @override
   final String? valueUpdateListenerFunCode = null;
+  
+  @override
+  final bool isAsync = true;
 }
 
 

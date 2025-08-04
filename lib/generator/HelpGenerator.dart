@@ -214,6 +214,7 @@ class OtherMethodInfo {
   final bool typeIsNull;
   final List<Map<String, dynamic>> methodParams;
   final String? classCode;
+  final bool isAsync;
   final String methodBody;
   final String? valueUpdateListenerFunCode;
 
@@ -223,6 +224,7 @@ class OtherMethodInfo {
     this.typeIsNull,
     this.methodParams,
     this.classCode,
+    this.isAsync,
     this.methodBody,
     this.valueUpdateListenerFunCode,
   );  
@@ -247,6 +249,7 @@ class OtherMethodInfo {
       typeIsNull,
       methodParams,
       reader.read('classCode').stringValueOrNull,
+      reader.read('isAsync').boolValue,
       reader.read('funCode').stringValue,
       reader.read('valueUpdateListenerFunCode').stringValueOrNull,
       );

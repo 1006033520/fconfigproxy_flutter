@@ -101,18 +101,14 @@ class _{{className}}Impl implements {{className}} {
     {{#methodParams}}
     {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} {{name}},
     {{/methodParams}}
-  ) {
+  ) {{#isAsync}}async{{/isAsync}} {
     {{methodBody}}
   }
   {{/otherMethods}}
-  
+
+  static final {{className}} _instance = _{{className}}Impl();
+
 }
 
-enum _enum_{{className}}{
-  instance;
-  
-  get{{className}}() => _{{className}}Impl();
-}
-
-{{className}} _\$Get{{className}}() => _enum_{{className}}.instance.get{{className}}();
+{{className}} _\$Get{{className}}() =>  _{{className}}Impl._instance;
 ''';

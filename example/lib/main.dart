@@ -1,10 +1,18 @@
+import 'package:fconfigproxy_example/UserConfig.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:fconfigproxy/fconfigproxy.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+void main() async {
+
+  final directory = await getApplicationSupportDirectory();
+  Hive.init(directory.path);
+  await Hive.openBox("UserConfig");
+
   runApp(const MyApp());
 }
 
@@ -16,36 +24,19 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  final _fconfigproxyPlugin = Fconfigproxy();
 
+  bool _isLogin = UserConfig.getUserConfig().isLogin;
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-  }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await _fconfigproxyPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
+    UserConfig.getUserConfig().isLoginNotifier.addListener(() {
+      setState(() {
+        _isLogin = UserConfig.getUserConfig().isLogin;
+      });
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +46,32 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: ListView(
+            children: [
+              Text('UserName: ${UserConfig.getUserConfig().userName ?? "null"}'),
+              Text('Age: ${UserConfig.getUserConfig().age ?? "null"}'),
+              Text('Is Login: $_isLogin'),
+              ElevatedButton(
+                onPressed: () {
+                  UserConfig.getUserConfig().userName = 'John Doe';
+                  UserConfig.getUserConfig().age = 30;
+                },
+                child: const Text('Set User Config'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  UserConfig.getUserConfig().isLogin = !_isLogin;
+                },
+                child: Text('Login ${!_isLogin ? "Out" : "In"}'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  UserConfig.getUserConfig().clearAll();
+                },
+                child: const Text('Clear All Config'),
+              ),
+            ],
+          ),
         ),
       ),
     );

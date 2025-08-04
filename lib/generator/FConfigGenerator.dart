@@ -80,6 +80,7 @@ class FConfigGenerator extends Generator {
               'typeIsNull': otherMethodInfo.typeIsNull,
               'methodParams': otherMethodInfo.methodParams,
               'methodBody': otherMethodInfo.methodBody,
+              'isAsync': otherMethodInfo.isAsync,
             });
 
             if(otherMethodInfo.classCode != null) {
@@ -126,6 +127,13 @@ class FConfigGenerator extends Generator {
 
           if(it.setFieldCode != null) {
             setMethods.add(it.toSetCodeMaps());
+          }
+
+          if(it.valueUpdateListenerFunCode != null) {
+            valueUpdates.add({
+              'keyName': it.keyName,
+              'valueUpdateListener': it.valueUpdateListenerFunCode,
+            });
           }
 
         }));
