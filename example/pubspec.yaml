@@ -41,7 +41,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   source_gen: ^2.0.0
-  mustache_template: ^2.0.0
+  jinja: ^0.6.4
   fconfigproxy:
     path: ../
 

@@ -22,33 +22,33 @@ class _{{className}}Impl implements {{className}} {
   }
   
   /// 拦截器生成的类级代码片段
-  {{#interceptClassCodes}}
-  {{{code}}}
-  {{/interceptClassCodes}}
+  {% for codeBlock in interceptClassCodes %}
+  {{ codeBlock.code }}
+  {% endfor %}
   
   /// 字段定义及其 getter/setter
-  {{#fields}}
-  late {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} _\${{keyName}};
+  {% for field in fields %}
+  late {{ field.type }}{% if field.typeIsNull %}?{% endif %} _\${{ field.keyName }};
   
-  {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} get _{{keyName}} => _\${{keyName}};
+  {{ field.type }}{% if field.typeIsNull %}?{% endif %} get _{{ field.keyName }} => _\${{ field.keyName }};
   
-  set _{{keyName}}({{{type}}}{{#typeIsNull}}?{{/typeIsNull}} value) {
-    if(_\${{keyName}} == value) {
+  set _{{ field.keyName }}({{ field.type }}{% if field.typeIsNull %}?{% endif %} value) {
+    if(_\${{ field.keyName }} == value) {
       return;
     }
-    _\${{keyName}} = value;
-    _updateValue("{{keyName}}",{{{type}}}, value);
+    _\${{ field.keyName }} = value;
+    _updateValue("{{ field.keyName }}",{{ field.type }}, value);
   }
-  {{/fields}}
+  {% endfor %}
   
   /// 读取所有配置项的值并通知变更
   void _read() {
-    {{#fields}}
-    _\${{keyName}} = _ConfigProxy.hasValue("{{keyName}}")
-        ? _ConfigProxy.getValue("{{keyName}}", {{{type}}})
-        : {{{defaultValue}}};
-    _noticeValueUpdate("{{keyName}}", {{{type}}}, _\${{keyName}});
-    {{/fields}}
+    {% for field in fields %}
+    _\${{ field.keyName }} = _ConfigProxy.hasValue("{{ field.keyName }}")
+        ? _ConfigProxy.getValue("{{ field.keyName }}", {{ field.type }})
+        : {{ field.defaultValue }};
+    _noticeValueUpdate("{{ field.keyName }}", {{ field.type }}, _\${{ field.keyName }});
+    {% endfor %}
   }
   
   /// 更新配置项的值，并通知监听
@@ -65,65 +65,63 @@ class _{{className}}Impl implements {{className}} {
   
   /// 通知配置项变更，触发监听器
   void _noticeValueUpdate(String key,Type type,Object? value) {
-    {{#valueUpdates}}
-    if(key == "{{keyName}}") {
-      {{{valueUpdateListener}}}
+    {% for update in valueUpdates %}
+    if(key == "{{ update.keyName }}") {
+      {{ update.valueUpdateListener }}
     }
-    {{/valueUpdates}}
+    {% endfor %}
 
-    {{#otherMethodListeners}}
-    {{{code}}}
-    {{/otherMethodListeners}}
+    {% for listener in otherMethodListeners %}
+    {{ listener.code }}
+    {% endfor %}
   }
   
   /// 生成的方法拦截器实现
-  {{#interceptMethods}}
-  {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} _{{name}}_intercept(
-    {{#methodParams}}
-    {{type}}{{#typeIsNull}}?{{/typeIsNull}} {{name}},
-    {{/methodParams}}
+  {% for method in interceptMethods %}
+  {{ method.type }}{% if method.typeIsNull %}?{% endif %} _{{ method.name }}_intercept(
+    {% for param in method.methodParams %}
+    {{ param.type }}{% if param.typeIsNull %}?{% endif %} {{ param.name }}{% if not loop.last %},{% endif %}
+    {% endfor %}
   ) {
-    {{methodBody}}
+    {{ method.methodBody }}
   }
-  {{/interceptMethods}}
+  {% endfor %}
   
   /// 生成的 set 方法实现
-  {{#setMethods}}
+  {% for method in setMethods %}
   @override
-  set {{name}}({{{type}}}{{#typeIsNull}}?{{/typeIsNull}} value) {
-    {{#isIntercept}}
-    _{{keyName}} = _{{interceptName}}_intercept(value);
-    {{/isIntercept}}
-    {{^isIntercept}}
-    _{{keyName}} = value;
-    {{/isIntercept}}
+  set {{ method.name }}({{ method.type }}{% if method.typeIsNull %}?{% endif %} value) {
+    {% if method.isIntercept %}
+    _{{ method.keyName }} = _{{ method.interceptName }}_intercept(value);
+    {% else %}
+    _{{ method.keyName }} = value;
+    {% endif %}
   }
-  {{/setMethods}}
+  {% endfor %}
   
   /// 生成的 get 方法实现
-  {{#getMethods}}
+  {% for method in getMethods %}
   @override
-  {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} get {{name}} {
-    {{#isIntercept}}
-    return _{{interceptName}}_intercept(_{{keyName}});
-    {{/isIntercept}}
-    {{^isIntercept}}
-    return _{{keyName}};
-    {{/isIntercept}}
+  {{ method.type }}{% if method.typeIsNull %}?{% endif %} get {{ method.name }} {
+    {% if method.isIntercept %}
+    return _{{ method.interceptName }}_intercept(_{{ method.keyName }});
+    {% else %}
+    return _{{ method.keyName }};
+    {% endif %}
   }
-  {{/getMethods}}
+  {% endfor %}
   
   /// 生成的其他方法实现
-  {{#otherMethods}}
+  {% for method in otherMethods %}
   @override
-  {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} {{name}}(
-    {{#methodParams}}
-    {{{type}}}{{#typeIsNull}}?{{/typeIsNull}} {{name}},
-    {{/methodParams}}
-  ) {{#isAsync}}async{{/isAsync}} {
-    {{methodBody}}
+  {{ method.type }}{% if method.typeIsNull %}?{% endif %} {{ method.name }}(
+    {% for param in method.methodParams %}
+    {{ param.type }}{% if param.typeIsNull %}?{% endif %} {{ param.name }}{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ) {% if method.isAsync %}async{% endif %} {
+    {{ method.methodBody }}
   }
-  {{/otherMethods}}
+  {% endfor %}
 
   /// 单例实例
   static final {{className}} _instance = _{{className}}Impl();

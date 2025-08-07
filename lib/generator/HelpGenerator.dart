@@ -3,7 +3,7 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:fconfigproxy/utils/buildRunnerFun.dart';
 import 'package:fconfigproxy/utils/fun.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:mustache_template/mustache.dart';
+import 'package:jinja/jinja.dart';
 
 import '../annotation/FConfigAnnotationField.dart';
 import '../annotation/FConfigAnnotationGenerator.dart';
@@ -175,19 +175,19 @@ class FieldInterceptInfo implements FConfigFieldInterceptGenerator {
       reader
           .read('classCode')
           .stringValueOrNull
-          ?.let((it) => Template(it).renderString(templateData)),
+          ?.let((it) => Template(it).render(templateData)),
       reader
           .read('getFieldCode')
           .stringValueOrNull
-          ?.let((it) => Template(it).renderString(templateData)),
+          ?.let((it) => Template(it).render(templateData)),
       reader
           .read('setFieldCode')
           .stringValueOrNull
-          ?.let((it) => Template(it).renderString(templateData)),
+          ?.let((it) => Template(it).render(templateData)),
       reader
           .read('valueUpdateListenerFunCode')
           .stringValueOrNull
-          ?.let((it) => Template(it).renderString(templateData)),
+          ?.let((it) => Template(it).render(templateData)),
     );
   }
 
@@ -309,36 +309,33 @@ class OtherMethodInfo {
       'methodName': methodElement.name,
       'returnType': returnType == 'void' ? null : returnType,
       'returnTypeIsNull': typeIsNull,
+      'methodParams': methodParams,
       'isAsync': methodElement.isAsynchronous,
     };
-
-    methodElement.parameters.forEach((param) {
-      templateData[param.name] = {
-        
-      };
-    });
 
     FConfigAnnotationFieldInfo.create(reader).let((it){
       for (var field in it.fields) {
         final fieldElement = reader.read(field);
 
         if(fieldElement.isNull) {
+          templateData[field] = [];
           return;
         }
         templateData[field] = fieldElement.objectValue.parsedValue;
-
       }
     });
+
+    print('测试 $templateData');
 
     return OtherMethodInfo(
       methodElement.name,
       returnType,
       typeIsNull,
       methodParams,
-      reader.read('classCode').stringValueOrNull?.let((it) => Template(it,lenient: true).renderString(templateData)),
+      reader.read('classCode').stringValueOrNull?.let((it) => Template(it).render(templateData)),
       reader.read('isAsync').boolValue,
-      reader.read('funCode').stringValue.let((it) => Template(it,lenient: true).renderString(templateData)),
-      reader.read('valueUpdateListenerFunCode').stringValueOrNull?.let((it) => Template(it,lenient: true).renderString(templateData)),
+      reader.read('funCode').stringValue.let((it) => Template(it).render(templateData)),
+      reader.read('valueUpdateListenerFunCode').stringValueOrNull?.let((it) => Template(it).render(templateData)),
       );
   }
 

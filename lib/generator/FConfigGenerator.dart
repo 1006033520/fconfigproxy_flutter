@@ -2,7 +2,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:fconfigproxy/annotation/FConfigAnnotationGenerator.dart';
 import 'package:fconfigproxy/generator/HelpGenerator.dart';
 import 'package:fconfigproxy/utils/fun.dart';
-import 'package:mustache_template/mustache.dart';
+import 'package:jinja/jinja.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:build/build.dart';
 import '../annotation/FConfig.dart';
@@ -151,7 +151,7 @@ class FConfigGenerator extends Generator {
 
         }));
 
-        // 使用 Mustache 模板渲染最终代码
+        // 使用 Jinja 模板渲染最终代码
         // 模板参数说明：
         // className: 被代理的类名
         // configProxy: 代理实现类（具体进行key、value操作的实现类）
@@ -164,7 +164,8 @@ class FConfigGenerator extends Generator {
         // getMethods: getter 方法集合
         // otherMethodListeners: 其他方法监听器
         // otherMethods: 其他方法集合
-        final generatorCode = Template(dartCodeTemplate).renderString({
+        final template = Template(dartCodeTemplate);
+        final generatorCode = template.render({
           'className': element.name,
           'configProxy': proxyType.getDisplayString(),
           'configName': fConfigAnnotation.read('configName').stringValue,

@@ -43,13 +43,13 @@ class FConfigValueNotifier implements FConfigFieldInterceptGenerator {
   /// 生成的类代码片段，声明 ValueNotifier 并初始化。
   @override
   final String classCode = '''
-  late final _{{name}}_ValueNotifier = ValueNotifier<{{keyType}}{{#keyTypeIsNull}}?{{/keyTypeIsNull}}>(_{{keyName}});
+  late final _{{ name }}_ValueNotifier = ValueNotifier<{{ keyType }}{% if keyTypeIsNull %}?{% endif %}>(_{{ keyName }});
   ''';
 
   /// 生成的值变更监听方法代码片段，实现 ValueNotifier 的赋值。
   @override
   final String valueUpdateListenerFunCode = '''
-  _{{name}}_ValueNotifier.value = (value as {{keyType}}{{#keyTypeIsNull}}?{{/keyTypeIsNull}});
+  _{{ name }}_ValueNotifier.value = (value as {{ keyType }}{% if keyTypeIsNull %}?{% endif %});
   ''';
 
   /// 生成的设置字段代码片段（此处无实现）。
@@ -59,7 +59,7 @@ class FConfigValueNotifier implements FConfigFieldInterceptGenerator {
   /// 生成的获取字段代码片段，返回 ValueNotifier。
   @override
   final String? getFieldCode = '''
-  return _{{name}}_ValueNotifier;
+  return _{{ name }}_ValueNotifier;
   ''';
 }
 
@@ -98,21 +98,21 @@ class FConfigValueUpdateListener implements FConfigFunInterceptGenerator{
 
   @override
   final String? classCode = '''
-  late final _{{methodName}}_valueListenerManager = FConfigValueListenerManager([
-    {{#keyNames}}
-    '{{.}}',
-    {{/keyNames}}
+  late final _{{ methodName }}_valueListenerManager = FConfigValueListenerManager([
+    {% for keyName in keyNames %}
+    '{{ keyName }}',
+    {% endfor %}
   ]);
   ''';
   
   @override
   final String funCode = '''
-  {{#methodParams}}
-  _{{methodName}}_valueListenerManager.addListener({{name}});
-  {{/methodParams}}
-  {{#returnType}}
-  return _{{methodName}}_valueListenerManager;
-  {{/returnType}}
+  {% for param in methodParams %}
+  _{{ methodName }}_valueListenerManager.addListener({{ param.name }});
+  {% endfor %}
+  {% if returnType %}
+  return _{{ methodName }}_valueListenerManager;
+  {% endif %}
   ''';
   
   @override
@@ -120,7 +120,7 @@ class FConfigValueUpdateListener implements FConfigFunInterceptGenerator{
   
   @override
   final String valueUpdateListenerFunCode = '''
-  _{{methodName}}_valueListenerManager.notifyListeners(key, type, value);
+  _{{ methodName }}_valueListenerManager.notifyListeners(key, type, value);
   ''';
 }
 
@@ -139,9 +139,9 @@ class FConfigValueUpdateListenerRemove implements FConfigFunInterceptGenerator{
 
   @override
   final String funCode = '''
-  {{#methodParams}}
-  _{{listenerMethodName}}_valueListenerManager.removeListener({{name}});
-  {{/methodParams}}
+  {% for param in methodParams %}
+  _{{ listenerMethodName }}_valueListenerManager.removeListener({{ param.name }});
+  {% endfor %}
   ''';
 
     @override

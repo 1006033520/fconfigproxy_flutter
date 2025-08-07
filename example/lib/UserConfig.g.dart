@@ -18,6 +18,7 @@ class _UserConfigImpl implements UserConfig {
   }
 
   /// 拦截器生成的类级代码片段
+
   late final _addValueUpdateListener_valueListenerManager =
       FConfigValueListenerManager([]);
 
@@ -30,6 +31,7 @@ class _UserConfigImpl implements UserConfig {
   late final _isLoginNotifier_ValueNotifier = ValueNotifier<bool>(_isLogin);
 
   /// 字段定义及其 getter/setter
+
   late String? _$userName;
 
   String? get _userName => _$userName;
@@ -72,10 +74,12 @@ class _UserConfigImpl implements UserConfig {
         ? _ConfigProxy.getValue("userName", String)
         : null;
     _noticeValueUpdate("userName", String, _$userName);
+
     _$age = _ConfigProxy.hasValue("age")
         ? _ConfigProxy.getValue("age", int)
         : null;
     _noticeValueUpdate("age", int, _$age);
+
     _$isLogin = _ConfigProxy.hasValue("isLogin")
         ? _ConfigProxy.getValue("isLogin", bool)
         : false;
@@ -120,11 +124,13 @@ class _UserConfigImpl implements UserConfig {
   }
 
   /// 生成的方法拦截器实现
+
   ValueNotifier<bool> _get_isLoginNotifier_intercept(bool isLogin) {
     return _isLoginNotifier_ValueNotifier;
   }
 
   /// 生成的 set 方法实现
+
   @override
   set userName(String? value) {
     _userName = value;
@@ -141,6 +147,7 @@ class _UserConfigImpl implements UserConfig {
   }
 
   /// 生成的 get 方法实现
+
   @override
   String? get userName {
     return _userName;
@@ -162,6 +169,7 @@ class _UserConfigImpl implements UserConfig {
   }
 
   /// 生成的其他方法实现
+
   @override
   void clearAll() async {
     await _ConfigProxy.deleteAllValues();
