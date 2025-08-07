@@ -17,14 +17,14 @@
             "program": "test/fconfigproxy_test.dart"
         },
         {
-            "name": "Debug build_runner",
+            "name": "Debug example build_runner",
             "type": "dart",
             "request": "launch",
             "program": "${workspaceFolder}\\example\\.dart_tool\\build\\entrypoint\\build.dart",
             "args": [
                 "build"
             ], // 可以替换为 "build" 或其他命令
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}\\example",
             "console": "terminal"
         },
         {

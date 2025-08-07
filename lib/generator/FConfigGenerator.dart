@@ -81,7 +81,7 @@ class FConfigGenerator extends Generator {
         }
 
         // 遍历类方法，收集方法拦截器注解
-        element.methods.forEach((it){
+        for (var it in element.methods) {
           final funIntercept = findFirstAnnotation(it, FConfigFunInterceptGenerator);
           if(funIntercept != null){
             final otherMethodInfo = OtherMethodInfo.create(it, funIntercept);
@@ -106,7 +106,7 @@ class FConfigGenerator extends Generator {
 
           }
 
-        });
+        }
 
         // 处理字段拦截器相关信息
         for (var i = 0; i < fieldElementIntercepts.length; i++) {

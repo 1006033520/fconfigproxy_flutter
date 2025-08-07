@@ -5,6 +5,7 @@ import 'package:fconfigproxy/utils/fun.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:mustache_template/mustache.dart';
 
+import '../annotation/FConfigAnnotationField.dart';
 import '../annotation/FConfigAnnotationGenerator.dart';
 import '../annotation/FConfigKey.dart';
 import 'FConfigGenerator.dart';
@@ -78,6 +79,24 @@ class FieldInfo {
       fConfigKey?.defaultValue ?? 'null',
       field.setter != null,
     );
+  }
+}
+
+class FConfigAnnotationFieldInfo{
+  final List<String> fields;
+
+  const FConfigAnnotationFieldInfo(this.fields);
+
+  factory FConfigAnnotationFieldInfo.create(ConstantReader reader){
+    final typeChecker = TypeChecker.fromRuntime(FconfigAnnotationField);
+    return reader.objectValue.type?.element?.let((it){
+      if(it is ClassElement){
+        return it.fields.where((field) => typeChecker.hasAnnotationOf(field)).map((field) {
+          return field.name;
+        }).toList();
+      }
+      return null;
+    })?.let((it) => FConfigAnnotationFieldInfo(it)) ?? const FConfigAnnotationFieldInfo([]);
   }
 }
 
@@ -286,15 +305,40 @@ class OtherMethodInfo {
       };
     }).toList();
 
+    final Map<String,dynamic> templateData = {
+      'methodName': methodElement.name,
+      'returnType': returnType == 'void' ? null : returnType,
+      'returnTypeIsNull': typeIsNull,
+      'isAsync': methodElement.isAsynchronous,
+    };
+
+    methodElement.parameters.forEach((param) {
+      templateData[param.name] = {
+        
+      };
+    });
+
+    FConfigAnnotationFieldInfo.create(reader).let((it){
+      for (var field in it.fields) {
+        final fieldElement = reader.read(field);
+
+        if(fieldElement.isNull) {
+          return;
+        }
+        templateData[field] = fieldElement.objectValue.parsedValue;
+
+      }
+    });
+
     return OtherMethodInfo(
       methodElement.name,
       returnType,
       typeIsNull,
       methodParams,
-      reader.read('classCode').stringValueOrNull,
+      reader.read('classCode').stringValueOrNull?.let((it) => Template(it,lenient: true).renderString(templateData)),
       reader.read('isAsync').boolValue,
-      reader.read('funCode').stringValue,
-      reader.read('valueUpdateListenerFunCode').stringValueOrNull,
+      reader.read('funCode').stringValue.let((it) => Template(it,lenient: true).renderString(templateData)),
+      reader.read('valueUpdateListenerFunCode').stringValueOrNull?.let((it) => Template(it,lenient: true).renderString(templateData)),
       );
   }
 

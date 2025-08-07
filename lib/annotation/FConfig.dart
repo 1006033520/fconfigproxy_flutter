@@ -1,4 +1,9 @@
+import 'package:meta/meta_meta.dart';
+
 /// 配置注解类，用于标记配置名称和代理类型。
+@Target({
+  TargetKind.classType,
+})
 class FConfig {
   /// 配置名称
   final String configName;
