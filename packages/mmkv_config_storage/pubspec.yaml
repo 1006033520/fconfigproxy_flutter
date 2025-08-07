@@ -1,5 +1,5 @@
-name: fconfigproxy
-description: "A new Flutter project."
+name: mmkv_config_storage
+description: "A new Flutter plugin project."
 version: 0.0.1
 homepage:
 
@@ -7,24 +7,17 @@ environment:
   sdk: ^3.8.1
   flutter: '>=3.3.0'
 
-
 dependencies:
-  analyzer: ^7.5.4
-  meta: ^1.9.1
   flutter:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  plugin_platform_interface: ^2.0.2
-  collection: ^1.18.0
+  mmkv: ^2.2.2
+  fconfigproxy:
+    path: ../../
 
 
 dev_dependencies:
-  build_runner: ^2.4.7
-  source_gen: ^2.0.0
-  jinja: ^0.6.4
-
-
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0

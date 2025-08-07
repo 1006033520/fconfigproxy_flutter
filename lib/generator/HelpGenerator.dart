@@ -82,18 +82,33 @@ class FieldInfo {
   }
 }
 
+/// 注解字段信息类，用于提取注解中被@FconfigAnnotationField标记的字段
+///
+/// 该类用于分析注解类，找出其中被@FconfigAnnotationField标记的字段
+/// 以便在代码生成过程中正确处理这些字段的值
 class FConfigAnnotationFieldInfo{
   final List<String> fields;
 
+  /// 构造函数
+  ///
+  /// [fields] - 被@FconfigAnnotationField标记的字段名称列表
   const FConfigAnnotationFieldInfo(this.fields);
 
+  /// 工厂方法：从ConstantReader创建FConfigAnnotationFieldInfo实例
+  ///
+  /// [reader] - 注解的ConstantReader
+  ///
+  /// 返回包含被@FconfigAnnotationField标记的字段名称列表的实例
   factory FConfigAnnotationFieldInfo.create(ConstantReader reader){
     final typeChecker = TypeChecker.fromRuntime(FconfigAnnotationField);
+    // 获取注解类型的元素
     return reader.objectValue.type?.element?.let((it){
       if(it is ClassElement){
-        return it.fields.where((field) => typeChecker.hasAnnotationOf(field)).map((field) {
-          return field.name;
-        }).toList();
+        // 查找所有被@FconfigAnnotationField标记的字段
+        return it.fields
+          .where((field) => typeChecker.hasAnnotationOf(field))
+          .map((field) => field.name)
+          .toList();
       }
       return null;
     })?.let((it) => FConfigAnnotationFieldInfo(it)) ?? const FConfigAnnotationFieldInfo([]);
@@ -164,6 +179,18 @@ class FieldInterceptInfo implements FConfigFieldInterceptGenerator {
       "keyType": fieldInfo.type,
       "keyTypeIsNull": fieldInfo.typeIsNull,
     };
+
+    FConfigAnnotationFieldInfo.create(reader).let((it){
+      for (var field in it.fields) {
+        final fieldElement = reader.read(field);
+
+        if(fieldElement.isNull) {
+          templateData[field] = [];
+          return;
+        }
+        templateData[field] = fieldElement.objectValue.parsedValue;
+      }
+    });
 
     return FieldInterceptInfo(
       field.name,
@@ -279,6 +306,15 @@ class OtherMethodInfo {
   final String? valueUpdateListenerFunCode;
 
   /// 构造函数
+  ///
+  /// [name] - 方法名
+  /// [type] - 返回类型
+  /// [typeIsNull] - 返回类型是否可空
+  /// [methodParams] - 参数列表（包含类型、可空、名称等信息）
+  /// [classCode] - 生成的类级代码片段
+  /// [isAsync] - 是否为异步方法
+  /// [methodBody] - 生成的方法体代码
+  /// [valueUpdateListenerFunCode] - 生成的值变更监听方法代码片段
   const OtherMethodInfo(
     this.name,
     this.type,
@@ -324,8 +360,6 @@ class OtherMethodInfo {
         templateData[field] = fieldElement.objectValue.parsedValue;
       }
     });
-
-    print('测试 $templateData');
 
     return OtherMethodInfo(
       methodElement.name,
