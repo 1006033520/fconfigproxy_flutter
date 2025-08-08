@@ -14,7 +14,7 @@ void main() async {
     Hive.init(directory.path);
   }
 
-  await UserConfig.getUserConfig().initUserConfig();
+  await UserConfigHive.getUserConfig().initUserConfigHive();
 
   runApp(const MyApp());
 }
@@ -27,14 +27,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isLogin = UserConfig.getUserConfig().isLogin;
+  bool _isLogin = UserConfigHive.getUserConfig().isLogin;
   @override
   void initState() {
     super.initState();
 
-    UserConfig.getUserConfig().isLoginNotifier.addListener(() {
+    UserConfigHive.getUserConfig().isLoginNotifier.addListener(() {
       setState(() {
-        _isLogin = UserConfig.getUserConfig().isLogin;
+        _isLogin = UserConfigHive.getUserConfig().isLogin;
       });
     });
   }
@@ -48,26 +48,26 @@ class _MyAppState extends State<MyApp> {
           child: ListView(
             children: [
               Text(
-                'UserName: ${UserConfig.getUserConfig().userName ?? "null"}',
+                'UserName: ${UserConfigHive.getUserConfig().userName ?? "null"}',
               ),
-              Text('Age: ${UserConfig.getUserConfig().age ?? "null"}'),
+              Text('Age: ${UserConfigHive.getUserConfig().age ?? "null"}'),
               Text('Is Login: $_isLogin'),
               ElevatedButton(
                 onPressed: () {
-                  UserConfig.getUserConfig().userName = 'John Doe';
-                  UserConfig.getUserConfig().age = 30;
+                  UserConfigHive.getUserConfig().userName = 'John Doe';
+                  UserConfigHive.getUserConfig().age = 30;
                 },
                 child: const Text('Set User Config'),
               ),
               ElevatedButton(
                 onPressed: () {
-                  UserConfig.getUserConfig().isLogin = !_isLogin;
+                  UserConfigHive.getUserConfig().isLogin = !_isLogin;
                 },
                 child: Text('Login ${!_isLogin ? "Out" : "In"}'),
               ),
               ElevatedButton(
                 onPressed: () {
-                  UserConfig.getUserConfig().clearAll();
+                  UserConfigHive.getUserConfig().clearAll();
                 },
                 child: const Text('Clear All Config'),
               ),

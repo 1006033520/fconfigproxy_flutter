@@ -192,6 +192,20 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  fconfigproxy_hive_storage:
+    dependency: "direct dev"
+    description:
+      path: "../packages/fconfigproxy_hive_storage"
+      relative: true
+    source: path
+    version: "0.0.1"
+  fconfigproxy_mmkv_storage:
+    dependency: "direct dev"
+    description:
+      path: "../packages/fconfigproxy_mmkv_storage"
+      relative: true
+    source: path
+    version: "0.0.1"
   ffi:
     dependency: transitive
     description:
@@ -422,6 +436,46 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  mmkv:
+    dependency: transitive
+    description:
+      name: mmkv
+      sha256: "2cd899fe1d59c2ffd8c552202fde7a8701c85f290480daa9838a78f82c4de0fa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
+  mmkv_android:
+    dependency: transitive
+    description:
+      name: mmkv_android
+      sha256: "0407d7a0338a56c20e9281363009fafa2c20b4e524d0058f9a614c6d482b123f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
+  mmkv_ios:
+    dependency: transitive
+    description:
+      name: mmkv_ios
+      sha256: "79868842d886fc4f9a38fa75ab0f3ac03068a65405f6cb125ffa8bb427989ee7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
+  mmkv_ohos:
+    dependency: transitive
+    description:
+      name: mmkv_ohos
+      sha256: a4e96832f9ecb0adb13e9f65ecd81a18945c044d844d077c896ab90365166b28
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
+  mmkv_platform_interface:
+    dependency: transitive
+    description:
+      name: mmkv_platform_interface
+      sha256: "65d5c1a2c43ad5d064bbf956eed45bb62e89c4fe8ccac40de829959e16ba62d1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.1"
   package_config:
     dependency: transitive
     description:

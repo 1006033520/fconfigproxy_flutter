@@ -44,6 +44,12 @@ dev_dependencies:
   jinja: ^0.6.4
   fconfigproxy:
     path: ../
+  fconfigproxy_hive_storage:
+    path: ../packages/fconfigproxy_hive_storage
+  fconfigproxy_mmkv_storage:
+    path: ../packages/fconfigproxy_mmkv_storage
+
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
