@@ -11,9 +11,12 @@ class _UserConfigImpl implements UserConfig {
   /// 配置代理实例，静态成员保证全局唯一
   static final MyFConfigProxy _ConfigProxy = MyFConfigProxy();
 
-  /// 构造函数，初始化配置并读取初始值
-  _UserConfigImpl() {
-    _ConfigProxy.init("UserConfig");
+  /// 构造函数
+  _UserConfigImpl();
+
+  /// 初始化配置
+  Future<void> init() async {
+    await _ConfigProxy.init("UserConfig");
     _read();
   }
 
@@ -208,3 +211,10 @@ class _UserConfigImpl implements UserConfig {
 
 /// 获取单例实例的方法
 UserConfig _$GetUserConfig() => _UserConfigImpl._instance;
+
+/// 扩展方法，用于初始化配置
+extension UserConfigExtension on UserConfig {
+  Future<void> initUserConfig() async {
+    await (this as _UserConfigImpl).init();
+  }
+}

@@ -1,4 +1,4 @@
-# mmkv_config_storage
+# fconfigproxy_mmkv_storage
 
 A new Flutter plugin project.
 

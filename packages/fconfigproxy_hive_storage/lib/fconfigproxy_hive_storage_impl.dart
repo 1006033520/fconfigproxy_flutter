@@ -8,28 +8,10 @@ import 'package:flutter/widgets.dart';
 /// 使用 Hive 数据库实现配置的存储和管理。
 class HiveConfigStorageImpl implements FConfigKeyValueHandle {
   late Box _box;
-  String? _configName;
 
   @override
-  void init(String configName) {
-    _configName = configName;
-    // 注意：Hive初始化是异步的，但接口定义是非异步的
-    // 这里使用同步方式初始化，实际应用中可能需要处理初始化完成的回调
-    WidgetsFlutterBinding.ensureInitialized();
-    final directory = getApplicationDocumentsDirectory().then((dir) {
-      Hive.init(dir.path);
-      Hive.openBox(configName).then((box) {
-        _box = box;
-      });
-    });
-  }
-
-  /// 检查Hive是否已初始化完成
-  Future<bool> isInitialized() async {
-    while (_box == null) {
-      await Future.delayed(Duration(milliseconds: 10));
-    }
-    return true;
+  Future<void> init(String configName) async {
+    _box = await Hive.openBox(configName);
   }
 
   @override

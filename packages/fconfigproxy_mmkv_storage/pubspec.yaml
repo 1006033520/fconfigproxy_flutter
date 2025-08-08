@@ -1,4 +1,4 @@
-name: mmkv_config_storage
+name: fconfigproxy_mmkv_storage
 description: "A new Flutter plugin project."
 version: 0.0.1
 homepage:

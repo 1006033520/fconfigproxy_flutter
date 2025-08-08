@@ -10,13 +10,8 @@ class MyFConfigProxy implements FConfigKeyValueHandle {
   // }
 
   @override
-  void init(String configName) {
-    _box = Hive.box(configName);
-  }
-
-  @override
-  Future<void> deleteAllValues() async {
-    await _box!.clear();
+  Future<void> init(String configName) async {
+    _box = await Hive.openBox(configName);
   }
 
   @override
@@ -38,6 +33,12 @@ class MyFConfigProxy implements FConfigKeyValueHandle {
   bool hasValue(String key) {
     return _box!.containsKey(key);
   }
+  
+  @override
+  Future<void> deleteAllValues() async{
+    await _box!.clear();
+  }
+
 
 }
 

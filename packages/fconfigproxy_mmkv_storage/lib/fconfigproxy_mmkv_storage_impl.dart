@@ -8,11 +8,9 @@ import 'package:mmkv/mmkv.dart';
 /// 使用 MMKV 高性能存储库实现配置的存储和管理。
 class MMKVConfigStorageImpl implements FConfigKeyValueHandle {
   late MMKV _mmkv;
-  String? _configName;
 
   @override
-  void init(String configName) {
-    _configName = configName;
+  Future<void> init(String configName) async {
     _mmkv = MMKV(configName);
   }
 

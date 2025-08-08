@@ -7,7 +7,7 @@ abstract class FConfigKeyValueHandle {
   /// 初始化存储实例。
   ///
   /// [configName] 用于指定存储空间或命名空间。
-  void init(String configName);
+  Future<void> init(String configName);
 
   /// 判断指定 key 是否存在。
   ///

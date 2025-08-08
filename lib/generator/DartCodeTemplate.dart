@@ -15,9 +15,12 @@ class _{{className}}Impl implements {{className}} {
   /// 配置代理实例，静态成员保证全局唯一
   static final {{configProxy}} _ConfigProxy = {{configProxy}}();
   
-  /// 构造函数，初始化配置并读取初始值
-  _{{className}}Impl() {
-    _ConfigProxy.init("{{configName}}");
+  /// 构造函数
+  _{{className}}Impl();
+
+  /// 初始化配置
+  Future<void> init() async {
+    await _ConfigProxy.init("{{configName}}");
     _read();
   }
   
@@ -130,4 +133,12 @@ class _{{className}}Impl implements {{className}} {
 
 /// 获取单例实例的方法
 {{className}} _\$Get{{className}}() =>  _{{className}}Impl._instance;
+
+/// 扩展方法，用于初始化配置
+extension {{className}}Extension on {{className}} {
+  Future<void> init{{className}}() async {
+    await (this as _{{className}}Impl).init();
+  }
+}
+
 ''';

@@ -14,7 +14,7 @@ void main() async {
     Hive.init(directory.path);
   }
 
-  await Hive.openBox("UserConfig");
+  await UserConfig.getUserConfig().initUserConfig();
 
   runApp(const MyApp());
 }
