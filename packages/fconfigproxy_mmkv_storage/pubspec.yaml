@@ -14,8 +14,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   mmkv: ^2.2.2
-  fconfigproxy:
-    path: ../../
+  fconfigproxy: ^0.0.1
 
 
 dev_dependencies:

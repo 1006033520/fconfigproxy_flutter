@@ -15,8 +15,7 @@ dependencies:
   web: ^1.0.0
   hive: ^2.2.3
   path_provider: ^2.1.5
-  fconfigproxy:
-    path: ../../
+  fconfigproxy: ^0.0.1
 
 dev_dependencies:
   flutter_test:
