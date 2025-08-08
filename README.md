@@ -74,10 +74,6 @@ import 'package:flutter/material.dart';
 import 'AppConfig.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // 初始化配置
-  final config = await _$GetAppConfig();
 
   Hive.init('存储路径');//hive需要在初始化配置之前调用传入存储路径，否则会报错
   await AppConfig.getAppConfig().initAppConfig();
