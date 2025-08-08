@@ -1,3 +1,5 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* 初始版本发布
+* 实现了基于Hive数据库的配置持久化功能
+

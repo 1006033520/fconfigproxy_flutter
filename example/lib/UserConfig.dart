@@ -1,7 +1,6 @@
 import 'package:fconfigproxy/annotation/FConfig.dart';
 import 'package:fconfigproxy/annotation/FConfigKey.dart';
 import 'package:fconfigproxy/annotation/FConfigOtherAnnotation.dart';
-import 'package:fconfigproxy_example/MyFConfigProxy.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fconfigproxy_hive_storage/fconfigproxy_hive_storage_impl.dart';
 import 'package:fconfigproxy_mmkv_storage/fconfigproxy_mmkv_storage_impl.dart';

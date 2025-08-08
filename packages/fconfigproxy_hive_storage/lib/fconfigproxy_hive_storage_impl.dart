@@ -1,7 +1,5 @@
 import 'package:fconfigproxy/agreement/FConfigKeyValueHandle.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter/widgets.dart';
 
 /// Hive 配置存储实现类。
 ///
