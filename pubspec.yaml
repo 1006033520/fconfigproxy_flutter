@@ -1,7 +1,7 @@
 name: fconfigproxy
-description: "A new Flutter project."
+description: "A Flutter package for configuring proxy with annotation support and code generation."
 version: 0.0.1
-homepage:
+homepage: https://github.com/1006033520/fconfigproxy_flutter
 
 environment:
   sdk: ^3.8.1

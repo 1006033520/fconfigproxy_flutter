@@ -1,7 +1,8 @@
 name: fconfigproxy_mmkv_storage
-description: "A new Flutter plugin project."
+description: "A Flutter plugin for storing configuration data using MMKV."
 version: 0.0.1
-homepage:
+homepage: https://github.com/1006033520/fconfigproxy_flutter
+
 
 environment:
   sdk: ^3.8.1
