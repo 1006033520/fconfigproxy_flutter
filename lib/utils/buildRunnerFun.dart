@@ -35,14 +35,14 @@ extension DartTypeExtension on DartType {
 // ------------------------------
 // 核心类型检查器
 // ------------------------------
-const _boolChecker = TypeChecker.fromRuntime(bool);
-const _intChecker = TypeChecker.fromRuntime(int);
-const _doubleChecker = TypeChecker.fromRuntime(double);
-const _stringChecker = TypeChecker.fromRuntime(String);
-const _symbolChecker = TypeChecker.fromRuntime(Symbol);
-const _listChecker = TypeChecker.fromRuntime(List);
-const _mapChecker = TypeChecker.fromRuntime(Map);
-const _typeChecker = TypeChecker.fromRuntime(Type);
+const _boolChecker = TypeChecker.typeNamed(bool);
+const _intChecker = TypeChecker.typeNamed(int);
+const _doubleChecker = TypeChecker.typeNamed(double);
+const _stringChecker = TypeChecker.typeNamed(String);
+const _symbolChecker = TypeChecker.typeNamed(Symbol);
+const _listChecker = TypeChecker.typeNamed(List);
+const _mapChecker = TypeChecker.typeNamed(Map);
+const _typeChecker = TypeChecker.typeNamed(Type);
 
 // ------------------------------
 // DartObject扩展方法
@@ -66,26 +66,22 @@ extension DartObjectExtension on DartObject {
     } else if (_symbolChecker.isExactlyType(type)) {
       return toSymbolValue();
     }
-
     // 列表类型处理
     else if (_listChecker.isAssignableFromType(type)) {
       return toListValue()?.map((item) => item.parsedValue).toList();
     }
-
     // Map类型处理
     else if (_mapChecker.isAssignableFromType(type)) {
       final map = toMapValue() ?? {};
       return {
         for (final entry in map.entries)
-          entry.key?.parsedValue: entry.value?.parsedValue
+          entry.key?.parsedValue: entry.value?.parsedValue,
       };
     }
-
     // // 枚举类型处理（修正部分）
     // else if (type.element is EnumElement) {
     //   return _parseEnum(this, type.element as EnumElement);
     // }
-
     // 类型字面量处理
     else if (_typeChecker.isExactlyType(type)) {
       return {
@@ -94,7 +90,6 @@ extension DartObjectExtension on DartObject {
         'isNull': type.nullabilitySuffix == NullabilitySuffix.question,
       };
     }
-
     // 自定义对象处理
     else if (type is InterfaceType) {
       return _parseInterfaceType(this, type);
@@ -120,16 +115,19 @@ extension DartObjectExtension on DartObject {
   // }
 
   /// 解析接口类型（自定义类）
-  static Map<String, dynamic> _parseInterfaceType(DartObject object, InterfaceType type) {
+  static Map<String, dynamic> _parseInterfaceType(
+    DartObject object,
+    InterfaceType type,
+  ) {
     final classElement = type.element as ClassElement;
     return {
       '__type': 'instance',
       'class': classElement.name,
-      'library': classElement.library.source.uri.toString(),
+      'library': classElement.library.firstFragment.source.uri.toString(),
       'fields': {
         for (final field in classElement.fields)
           if (!field.isStatic)
-            field.name: object.getField(field.name)?.parsedValue
+            field.name: object.getField(field.name!)?.parsedValue,
       },
     };
   }

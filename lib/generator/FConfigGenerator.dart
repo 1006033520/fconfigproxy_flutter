@@ -13,7 +13,7 @@ Builder fConfigBuilder(BuilderOptions options) =>
     LibraryBuilder(FConfigGenerator());
 
 /// 获取 FConfig 注解的 TypeChecker，用于查找被注解的类。
-TypeChecker get typeChecker => TypeChecker.fromRuntime(FConfig);
+TypeChecker get typeChecker => TypeChecker.typeNamed(FConfig);
 
 /// FConfig 注解代码生成器，实现 source_gen 的 Generator。
 class FConfigGenerator extends Generator {
@@ -68,22 +68,28 @@ class FConfigGenerator extends Generator {
 
         // 遍历类字段，收集拦截器注解和普通字段信息
         for (var field in element.fields) {
-          final fieldIntercept = findFirstAnnotation(field, FConfigFieldInterceptGenerator);
-          if(fieldIntercept != null){
+          final fieldIntercept = findFirstAnnotation(
+            field,
+            FConfigFieldInterceptGenerator,
+          );
+          if (fieldIntercept != null) {
             fieldElementIntercepts.add(field);
             fieldReaderIntercepts.add(fieldIntercept);
             continue;
           }
           final fieldInfo = FieldInfo.create(field);
-          if(fieldInfo.typeIsNull || fieldInfo.defaultValue != 'null') {
+          if (fieldInfo.typeIsNull || fieldInfo.defaultValue != 'null') {
             fieldInfos.add(fieldInfo);
           }
         }
 
         // 遍历类方法，收集方法拦截器注解
         for (var it in element.methods) {
-          final funIntercept = findFirstAnnotation(it, FConfigFunInterceptGenerator);
-          if(funIntercept != null){
+          final funIntercept = findFirstAnnotation(
+            it,
+            FConfigFunInterceptGenerator,
+          );
+          if (funIntercept != null) {
             final otherMethodInfo = OtherMethodInfo.create(it, funIntercept);
             otherMethods.add({
               'name': otherMethodInfo.name,
@@ -94,61 +100,70 @@ class FConfigGenerator extends Generator {
               'isAsync': otherMethodInfo.isAsync,
             });
 
-            if(otherMethodInfo.classCode != null) {
+            if (otherMethodInfo.classCode != null) {
               interceptClassCodes.add({'code': otherMethodInfo.classCode!});
             }
 
-            if(otherMethodInfo.valueUpdateListenerFunCode != null) {
+            if (otherMethodInfo.valueUpdateListenerFunCode != null) {
               otherMethodListeners.add({
                 'code': otherMethodInfo.valueUpdateListenerFunCode,
               });
             }
-
           }
-
         }
 
         // 处理字段拦截器相关信息
         for (var i = 0; i < fieldElementIntercepts.length; i++) {
           final fieldElement = fieldElementIntercepts[i];
           final fieldReader = fieldReaderIntercepts[i];
-          final fieldInfo = FConfigKeyAnalysis.analysis(fieldElement)?.let((it){
-            return fieldInfos.firstWhere((element) => element.keyName == it.keyName);
+          final fieldInfo = FConfigKeyAnalysis.analysis(fieldElement)?.let((
+            it,
+          ) {
+            return fieldInfos.firstWhere(
+              (element) => element.keyName == it.keyName,
+            );
           });
-          if(fieldInfo == null){
+          if (fieldInfo == null) {
             continue;
           }
-          final fieldInterceptInfo = FieldInterceptInfo.create(fieldInfo,fieldElement, fieldReader);
+          final fieldInterceptInfo = FieldInterceptInfo.create(
+            fieldInfo,
+            fieldElement,
+            fieldReader,
+          );
           fieldInterceptInfos.add(fieldInterceptInfo);
         }
 
         // 整理字段、getter、setter、拦截器等信息，供模板渲染
-        fields.addAll(fieldInfos.map((fieldInfo)=>fieldInfo.toMap));
-        getMethods.addAll(fieldInfos.map((fieldInfo)=>fieldInfo.toMap));
-        setMethods.addAll(fieldInfos.where((fieldInfo)=>fieldInfo.isSet).map((fieldInfo)=>fieldInfo.toMap));
+        fields.addAll(fieldInfos.map((fieldInfo) => fieldInfo.toMap));
+        getMethods.addAll(fieldInfos.map((fieldInfo) => fieldInfo.toMap));
+        setMethods.addAll(
+          fieldInfos
+              .where((fieldInfo) => fieldInfo.isSet)
+              .map((fieldInfo) => fieldInfo.toMap),
+        );
 
         fieldInterceptInfos.forEach(((it) {
-          if(it.classCode != null) {
+          if (it.classCode != null) {
             interceptClassCodes.add({'code': it.classCode!});
           }
 
           interceptMethods.addAll(it.toInterceptMethodMaps());
 
-          if(it.getFieldCode != null) {
+          if (it.getFieldCode != null) {
             getMethods.add(it.toGetCodeMap());
           }
 
-          if(it.setFieldCode != null) {
+          if (it.setFieldCode != null) {
             setMethods.add(it.toSetCodeMap());
           }
 
-          if(it.valueUpdateListenerFunCode != null) {
+          if (it.valueUpdateListenerFunCode != null) {
             valueUpdates.add({
               'keyName': it.keyName,
               'valueUpdateListener': it.valueUpdateListenerFunCode,
             });
           }
-
         }));
 
         // 使用 Jinja 模板渲染最终代码
@@ -187,8 +202,8 @@ class FConfigGenerator extends Generator {
 
   /// 查找元素上的第一个指定类型的注解，返回 ConstantReader
   ConstantReader? findFirstAnnotation(Element element, Type type) {
-    final interceptChecker = TypeChecker.fromRuntime(type);
-    for (final annotation in element.metadata) {
+    final interceptChecker = TypeChecker.typeNamed(type);
+    for (final annotation in element.metadata.annotations) {
       final constantValue = annotation.computeConstantValue();
       if (constantValue == null) continue;
       final annotationType = constantValue.type;
@@ -203,8 +218,7 @@ class FConfigGenerator extends Generator {
 
 /// 获取元素上的指定类型注解（泛型），返回 ConstantReader
 ConstantReader? getAnnotation<T>(Element element) {
-  final typeChecker = TypeChecker.fromRuntime(T);
+  final typeChecker = TypeChecker.typeNamed(T);
   final annotations = typeChecker.annotationsOf(element);
   return annotations.isNotEmpty ? ConstantReader(annotations.first) : null;
 }
-

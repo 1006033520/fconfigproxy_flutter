@@ -16,15 +16,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  fconfigproxy_hive_storage:
+    path: ../packages/fconfigproxy_hive_storage
+  fconfigproxy_mmkv_storage:
+    path: ../packages/fconfigproxy_mmkv_storage
   fconfigproxy:
-    # When depending on this package from a real application you should use:
-    #   fconfigproxy: ^x.y.z
-    # See https://dart.dev/tools/pub/dependencies#version-constraints
-    # The example app is bundled with the plugin so we use a path dependency on
-    # the parent directory to use the current plugin's version.
     path: ../
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -40,14 +37,9 @@ dev_dependencies:
     sdk: flutter
   flutter_test:
     sdk: flutter
-  source_gen: ^2.0.0
+  source_gen: ^4.0.1
   jinja: ^0.6.4
-  fconfigproxy:
-    path: ../
-  fconfigproxy_hive_storage:
-    path: ../packages/fconfigproxy_hive_storage
-  fconfigproxy_mmkv_storage:
-    path: ../packages/fconfigproxy_mmkv_storage
+
 
 
 

@@ -19,14 +19,14 @@ fconfigproxy 是一个强大的 Flutter 配置代理框架，通过注解和代�
 
 ```yaml
 dependencies:
-  fconfigproxy: ^0.0.1
+  fconfigproxy: ^0.0.2
   fconfigproxy_hive_storage: ^0.0.1
   # 或/和
   fconfigproxy_mmkv_storage: ^0.0.1
 
 dev_dependencies:
-  build_runner: ^2.4.7
-  source_gen: ^2.0.0
+  build_runner: ^2.8.0
+  source_gen: ^4.0.1
   jinja: ^0.6.4
 ```
 

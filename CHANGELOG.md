@@ -1,3 +1,13 @@
+## 0.0.2
+
+* 升级了依赖库：将 analyzer 从 7.5.4 升级到 8.1.1
+* 修复了 API 兼容性问题：
+  - 将 `methodElement.isAsynchronous` 替换为 `methodElement.firstFragment.isAsynchronous`
+  - 将 `methodElement.parameters` 替换为 `methodElement.formalParameters`
+  - 更新了 TypeChecker 的使用方式
+* 优化了代码生成逻辑和错误处理
+* 改进了文档和示例代码
+
 ## 0.0.1
 
 * 初始版本发布

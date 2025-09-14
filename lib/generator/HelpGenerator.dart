@@ -33,14 +33,19 @@ class FConfigKeyAnalysis {
 class FieldInfo {
   /// 配置项 key 名
   final String keyName;
+
   /// 字段名
   final String name;
+
   /// 字段类型
   final String type;
+
   /// 字段是否可空
   final bool typeIsNull;
+
   /// 默认值
   final String defaultValue;
+
   /// 是否有 setter
   final bool isSet;
 
@@ -72,8 +77,8 @@ class FieldInfo {
     final fConfigKey = FConfigKeyAnalysis.analysis(field);
 
     return FieldInfo(
-      field.name,
-      fConfigKey?.keyName ?? field.name,
+      field.name!,
+      fConfigKey?.keyName ?? field.name!,
       field.type.genericsName,
       (field.type.nullabilitySuffix == NullabilitySuffix.question),
       fConfigKey?.defaultValue ?? 'null',
@@ -86,7 +91,7 @@ class FieldInfo {
 ///
 /// 该类用于分析注解类，找出其中被@FconfigAnnotationField标记的字段
 /// 以便在代码生成过程中正确处理这些字段的值
-class FConfigAnnotationFieldInfo{
+class FConfigAnnotationFieldInfo {
   final List<String> fields;
 
   /// 构造函数
@@ -99,19 +104,22 @@ class FConfigAnnotationFieldInfo{
   /// [reader] - 注解的ConstantReader
   ///
   /// 返回包含被@FconfigAnnotationField标记的字段名称列表的实例
-  factory FConfigAnnotationFieldInfo.create(ConstantReader reader){
-    final typeChecker = TypeChecker.fromRuntime(FconfigAnnotationField);
+  factory FConfigAnnotationFieldInfo.create(ConstantReader reader) {
+    final typeChecker = TypeChecker.typeNamed(FconfigAnnotationField);
     // 获取注解类型的元素
-    return reader.objectValue.type?.element?.let((it){
-      if(it is ClassElement){
-        // 查找所有被@FconfigAnnotationField标记的字段
-        return it.fields
-          .where((field) => typeChecker.hasAnnotationOf(field))
-          .map((field) => field.name)
-          .toList();
-      }
-      return null;
-    })?.let((it) => FConfigAnnotationFieldInfo(it)) ?? const FConfigAnnotationFieldInfo([]);
+    return reader.objectValue.type?.element
+            ?.let((it) {
+              if (it is ClassElement) {
+                // 查找所有被@FconfigAnnotationField标记的字段
+                return it.fields
+                    .where((field) => typeChecker.hasAnnotationOf(field))
+                    .map((field) => field.name!)
+                    .toList();
+              }
+              return null;
+            })
+            ?.let((it) => FConfigAnnotationFieldInfo(it)) ??
+        const FConfigAnnotationFieldInfo([]);
   }
 }
 
@@ -121,14 +129,19 @@ class FConfigAnnotationFieldInfo{
 class FieldInterceptInfo implements FConfigFieldInterceptGenerator {
   /// 字段名
   final String name;
+
   /// 字段类型
   final String type;
+
   /// 字段是否可空
   final bool typeIsNull;
+
   /// 配置项 key 名
   final String keyName;
+
   /// key 对应的类型（通常与字段类型一致）
   final String keyType;
+
   /// key 类型是否可空
   final bool keyTypeIsNull;
 
@@ -180,11 +193,11 @@ class FieldInterceptInfo implements FConfigFieldInterceptGenerator {
       "keyTypeIsNull": fieldInfo.typeIsNull,
     };
 
-    FConfigAnnotationFieldInfo.create(reader).let((it){
+    FConfigAnnotationFieldInfo.create(reader).let((it) {
       for (var field in it.fields) {
         final fieldElement = reader.read(field);
 
-        if(fieldElement.isNull) {
+        if (fieldElement.isNull) {
           templateData[field] = [];
           return;
         }
@@ -193,7 +206,7 @@ class FieldInterceptInfo implements FConfigFieldInterceptGenerator {
     });
 
     return FieldInterceptInfo(
-      field.name,
+      field.name!,
       field.type.genericsName,
       (field.type.nullabilitySuffix == NullabilitySuffix.question),
       fieldInfo.keyName,
@@ -290,18 +303,25 @@ class FieldInterceptInfo implements FConfigFieldInterceptGenerator {
 class OtherMethodInfo {
   /// 方法名
   final String name;
+
   /// 返回类型
   final String type;
+
   /// 是否可空
   final bool typeIsNull;
+
   /// 参数列表（类型、可空、名称）
   final List<Map<String, dynamic>> methodParams;
+
   /// 生成的类级代码片段
   final String? classCode;
+
   /// 是否为异步方法
   final bool isAsync;
+
   /// 生成的方法体代码
   final String methodBody;
+
   /// 生成的值变更监听方法代码片段
   final String? valueUpdateListenerFunCode;
 
@@ -324,7 +344,7 @@ class OtherMethodInfo {
     this.isAsync,
     this.methodBody,
     this.valueUpdateListenerFunCode,
-  );  
+  );
 
   /// 工厂方法：从方法元素和注解 ConstantReader 创建 OtherMethodInfo
   factory OtherMethodInfo.create(
@@ -332,28 +352,32 @@ class OtherMethodInfo {
     ConstantReader reader,
   ) {
     final returnType = methodElement.returnType.genericsName;
-    final typeIsNull = (methodElement.returnType.nullabilitySuffix == NullabilitySuffix.question);
-    final methodParams = methodElement.parameters.map((param) {
+    final typeIsNull =
+        (methodElement.returnType.nullabilitySuffix ==
+        NullabilitySuffix.question);
+    // 在analyzer 8.1.1版本中，parameters属性仍然可用，但返回类型可能有变化
+    final methodParams = methodElement.formalParameters.map((param) {
       return {
         'type': param.type.genericsName,
-        'typeIsNull': (param.type.nullabilitySuffix == NullabilitySuffix.question),
+        'typeIsNull':
+            (param.type.nullabilitySuffix == NullabilitySuffix.question),
         'name': param.name,
       };
     }).toList();
 
-    final Map<String,dynamic> templateData = {
+    final Map<String, dynamic> templateData = {
       'methodName': methodElement.name,
       'returnType': returnType == 'void' ? null : returnType,
       'returnTypeIsNull': typeIsNull,
       'methodParams': methodParams,
-      'isAsync': methodElement.isAsynchronous,
+      'isAsync': methodElement.firstFragment.isAsynchronous,
     };
 
-    FConfigAnnotationFieldInfo.create(reader).let((it){
+    FConfigAnnotationFieldInfo.create(reader).let((it) {
       for (var field in it.fields) {
         final fieldElement = reader.read(field);
 
-        if(fieldElement.isNull) {
+        if (fieldElement.isNull) {
           templateData[field] = [];
           return;
         }
@@ -362,15 +386,23 @@ class OtherMethodInfo {
     });
 
     return OtherMethodInfo(
-      methodElement.name,
+      methodElement.name!,
       returnType,
       typeIsNull,
       methodParams,
-      reader.read('classCode').stringValueOrNull?.let((it) => Template(it).render(templateData)),
+      reader
+          .read('classCode')
+          .stringValueOrNull
+          ?.let((it) => Template(it).render(templateData)),
       reader.read('isAsync').boolValue,
-      reader.read('funCode').stringValue.let((it) => Template(it).render(templateData)),
-      reader.read('valueUpdateListenerFunCode').stringValueOrNull?.let((it) => Template(it).render(templateData)),
-      );
+      reader
+          .read('funCode')
+          .stringValue
+          .let((it) => Template(it).render(templateData)),
+      reader
+          .read('valueUpdateListenerFunCode')
+          .stringValueOrNull
+          ?.let((it) => Template(it).render(templateData)),
+    );
   }
-
 }
