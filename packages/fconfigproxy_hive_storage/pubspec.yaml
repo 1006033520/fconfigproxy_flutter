@@ -8,11 +8,6 @@ environment:
   flutter: '>=3.3.0'
 
 dependencies:
-  flutter:
-    sdk: flutter
-  flutter_web_plugins:
-    sdk: flutter
-  web: ^1.0.0
   hive: ^2.2.3
   path_provider: ^2.1.5
   
